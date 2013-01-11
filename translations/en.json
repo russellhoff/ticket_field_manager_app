@@ -1,0 +1,6 @@
+{
+  "app": {
+    "description":  "Make a field mandatory",
+    "name":         "Required Field"
+  }
+}
