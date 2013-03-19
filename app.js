@@ -1,47 +1,53 @@
 (function() {
-    return {
-        events: {
-            'app.activated'                             : 'onActivated',
-            'ticket.custom_field_22096608.changed'      : 'handleField'
-        },
+  // Replace {{ID}} by your custom field id.
+  return {
+    doneLoading: false,
+    fieldSelector: 'custom_field_{{ID}}',
 
-        onActivated: function() {
-            if (this.ticketIsTarget()){
-                this.disableSave();
-                this.handleField();
-            }
-        },
+    events: {
+      'app.activated'                           : 'initializeIfReady',
+      'ticket.status.changed'                   : 'initializeIfReady',
+      'ticket.custom_field_{{ID}}.changed'    : 'handleField'
+    },
 
-        handleField: function(){
-            if (this.ticketIsTarget()){
-                if (_.isEmpty(this.fieldValue())){
-                    this.disableSave();
-                } else {
-                    this.enableSave();
-                }
-            }
-        },
+    initializeIfReady: function(){
+      if (!this.doneLoading &&
+          this.ticket() &&
+          this.ticket().id() &&
+          this.ticketIsTarget()){
 
-        ticketIsTarget: function(){
-            if (_.contains(["new", "open", "pending"], this.ticket().status()))
-                return true;
-            return false;
-        },
+        this.handleField();
+        this.doneLoading = true;
+      }
+    },
 
-        field: function(){
-            if (_.isEmpty(this._field))
-                this._field = this.ticketFields(this.fieldSelector());
-            return this._field;
-        },
+    handleField: function(){
+      if (_.isEmpty(this.fieldValue())){
+        services.appsTray().show();
 
-        fieldValue: function(){
-            return this.ticket().customField(this.fieldSelector());
-        },
+        this.updateHeader(this.renderTemplate('error', {
+          label: this.ticketFields(this.fieldSelector).label() }));
 
-        fieldSelector: function(){
-            return 'custom_field_22096608';
-        }
+        this.disableSave();
+      } else {
+        this.updateHeader('');
 
-    };
+        this.enableSave();
+      }
+    },
 
+    ticketIsTarget: function(){
+      if (_.contains(["new", "open", "pending"], this.ticket().status()))
+        return true;
+      return false;
+    },
+
+    fieldValue: function(){
+      return this.ticket().customField(this.fieldSelector);
+    },
+
+    updateHeader: function(value){
+      return this.$('header').html(value);
+    }
+  };
 }());
