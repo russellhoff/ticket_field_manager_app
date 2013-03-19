@@ -37,9 +37,7 @@
     },
 
     ticketIsTarget: function(){
-      if (_.contains(["new", "open", "pending"], this.ticket().status()))
-        return true;
-      return false;
+      return _.contains(["new", "open", "pending"], this.ticket().status());
     },
 
     fieldValue: function(){
