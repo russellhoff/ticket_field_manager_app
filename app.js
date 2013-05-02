@@ -11,7 +11,7 @@
     isReady: function(){
       return !this.doneLoading &&
         this.ticket() &&
-        _.contains(["new", "open", "pending"], this.ticket().status())
+        _.contains(["new", "open", "pending"], this.ticket().status());
     },
 
     initializeIfReady: function(){
