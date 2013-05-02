@@ -3,8 +3,10 @@
     "description":  "Make a field mandatory",
     "name":         "Required Field",
     "parameters": {
-      "required_fiels": "Required Fields",
-      "helpText": "List of ticket fields separated by commas. Example: status,custom_field_1234567"
+      "required_fiels": {
+        "label":"Required Fields",
+        "helpText": "List of ticket fields separated by commas. Example: status,custom_field_1234567"
+      }
     }
   },
   "error_message": "The following fields cannot be empty"
