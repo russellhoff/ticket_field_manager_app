@@ -1,51 +1,72 @@
 (function() {
-  // Replace {{ID}} by your custom field id.
   return {
     doneLoading: false,
-    fieldSelector: 'custom_field_{{ID}}',
-
+    fieldsOnError: [],
     events: {
-      'app.activated'                           : 'initializeIfReady',
-      'ticket.status.changed'                   : 'initializeIfReady',
-      'ticket.custom_field_{{ID}}.changed'    : 'handleField'
+      'app.activated'           : 'initializeIfReady',
+      'ticket.status.changed'   : 'initializeIfReady',
+      '*.changed'               : 'handleFieldEvent'
+    },
+
+    isReady: function(){
+      return !this.doneLoading &&
+        this.ticket() &&
+        _.contains(["new", "open", "pending"], this.ticket().status())
     },
 
     initializeIfReady: function(){
-      if (!this.doneLoading &&
-          this.ticket() &&
-          this.ticket().id() &&
-          this.ticketIsTarget()){
+      if (this.isReady()){
+        this.requiredFields().forEach(function(field){
+          this.validateField(field);
+        }, this);
 
-        this.handleField();
+        this.renderErrorIfAny();
         this.doneLoading = true;
       }
     },
 
-    handleField: function(){
-      if (_.isEmpty(this.fieldValue())){
-        services.appsTray().show();
+    handleFieldEvent: function(event){
+      // remove 'ticket.' from the event's propertyName in order to match our requiredFields
+      var field = event.propertyName.replace('ticket.', '');
 
-        this.updateHeader(this.renderTemplate('error', {
-          label: this.ticketFields(this.fieldSelector).label() }));
-
-        this.disableSave();
-      } else {
-        this.updateHeader('');
-
-        this.enableSave();
+      if (_.contains(this.requiredFields(), field) &&
+          this.doneLoading){
+        this.validateField(field);
+        this.renderErrorIfAny();
       }
     },
 
-    ticketIsTarget: function(){
-      return _.contains(["new", "open", "pending"], this.ticket().status());
+    renderErrorIfAny: function(){
+      if (_.isEmpty(this.fieldsOnError)){
+        this.enableSave();
+        this.switchTo('blank');
+      } else {
+        this.disableSave();
+        this.switchTo('error', { fields: this.fieldsLabel(this.fieldsOnError) });
+      }
     },
 
-    fieldValue: function(){
-      return this.ticket().customField(this.fieldSelector);
+    requiredFields: _.memoize(function(){
+      return this.setting('required_fields').split(',');
+    }),
+
+    validateField: function(field){
+      var value = this.containerContext().ticket[field];
+      var newFieldsOnError = [];
+
+      if (_.isEmpty(value) || value == '-'){
+        newFieldsOnError = _.union(this.fieldsOnError, [field]);
+      } else {
+        newFieldsOnError = _.without(this.fieldsOnError, field);
+      }
+
+      this.fieldsOnError = newFieldsOnError;
     },
 
-    updateHeader: function(value){
-      return this.$('header').html(value);
+    fieldsLabel: function(field){
+      return _.map(field, function(field){
+        return this.ticketFields(field).label();
+      }, this);
     }
   };
 }());

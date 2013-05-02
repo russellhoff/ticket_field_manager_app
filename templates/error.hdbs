@@ -1,3 +1,8 @@
 <div class="alert alert-error">
-  {{t "error_message"}}: <strong>{{label}}</strong>
+  <strong>{{t "error_message"}}</strong>:
+  <ul>
+    {{#each fields}}
+    <li><strong>{{this}}</strong></li>
+    {{/each}}
+  </ul>
 </div>
