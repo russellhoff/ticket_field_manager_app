@@ -16,13 +16,33 @@
 
     initializeIfReady: function(){
       if (this.isReady()){
-        this.requiredFields().forEach(function(field){
-          this.validateField(field);
-        }, this);
 
-        this.renderErrorIfAny();
+        this.handleRequiredFields();
+        this.handleHiddenFields();
+        this.handleReadOnlyFields();
+
         this.doneLoading = true;
       }
+    },
+
+    handleRequiredFields: function(){
+      this.requiredFields().forEach(function(field){
+        this.validateField(field);
+      }, this);
+
+      this.renderErrorIfAny();
+    },
+
+    handleHiddenFields: function(){
+      this.hiddenFields().forEach(function(field){
+        this.ticketFields(field).hide();
+      }, this);
+    },
+
+    handleReadOnlyFields: function(){
+      this.readOnlyFields().forEach(function(field){
+        this.ticketFields(field).disable();
+      }, this);
     },
 
     handleFieldEvent: function(event){
@@ -47,8 +67,20 @@
     },
 
     requiredFields: _.memoize(function(){
-      return this.setting('required_fields').split(',');
+      return this.fields('required_fields');
     }),
+
+    hiddenFields: _.memoize(function(){
+      return this.fields('hidden_fields');
+    }),
+
+    readOnlyFields: _.memoize(function(){
+      return this.fields('readonly_fields');
+    }),
+
+    fields: function(type){
+      return _.compact((this.setting(type) || '').split(','));
+    },
 
     validateField: function(field){
       var value = this.containerContext().ticket[field];

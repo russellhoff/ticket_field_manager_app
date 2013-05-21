@@ -3,9 +3,17 @@
     "description":  "Ticket Field Manager",
     "name":         "Ticket Field Manager",
     "parameters": {
-      "required_fiels": {
+      "required_fields": {
         "label":"Required Fields",
-        "helpText": "List of ticket fields separated by commas. Example: status,custom_field_1234567"
+        "helpText": "List of required ticket fields separated by commas. Example: status,custom_field_1234567"
+      },
+      "hidden_fields": {
+        "label":"Hidden Fields",
+        "helpText": "List of hidden ticket fields separated by commas. Example: status,custom_field_1234567"
+      },
+      "readonly_fields": {
+        "label":"ReadOnly Fields",
+        "helpText": "List of read only ticket fields separated by commas. Example: status,custom_field_1234567"
       }
     }
   },

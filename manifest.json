@@ -7,8 +7,15 @@
   "parameters":[
     {
       "name": "required_fields",
-      "type": "multiline",
-      "required": true
+      "type": "multiline"
+    },
+    {
+      "name": "hidden_fields",
+      "type": "multiline"
+    },
+    {
+      "name": "readonly_fields",
+      "type": "multiline"
     }
   ],
   "defaultLocale": "en",
