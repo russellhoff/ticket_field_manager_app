@@ -1,7 +1,7 @@
 {
   "app": {
-    "description":  "Make a field mandatory",
-    "name":         "Required Field",
+    "description":  "Ticket Field Manager",
+    "name":         "Ticket Field Manager",
     "parameters": {
       "required_fiels": {
         "label":"Required Fields",
