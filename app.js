@@ -2,27 +2,40 @@
   return {
     doneLoading: false,
     fieldsOnError: [],
+    requests: {
+      fetchUser: function(){
+        return {
+          url: '/api/v2/users/'+ this.currentUser().id() + '.json?include=groups,organizations'
+        };
+      }
+    },
+
     events: {
       'app.activated'           : 'initializeIfReady',
       'ticket.status.changed'   : 'initializeIfReady',
+      'fetchUser.done'          : 'initialize',
       '*.changed'               : 'handleFieldEvent'
     },
 
     isReady: function(){
       return !this.doneLoading &&
         this.ticket() &&
+        this.ticket().status() &&
         _.contains(["new", "open", "pending"], this.ticket().status());
     },
 
     initializeIfReady: function(){
       if (this.isReady()){
-
-        this.handleRequiredFields();
-        this.handleHiddenFields();
-        this.handleReadOnlyFields();
-
-        this.doneLoading = true;
+        this.ajax('fetchUser');
       }
+    },
+
+    initialize: function(data){
+      this.doneLoading = true;
+      this.data = data;
+      this.handleRequiredFields();
+      this.handleHiddenFields();
+      this.handleReadOnlyFields();
     },
 
     handleRequiredFields: function(){
@@ -79,11 +92,60 @@
     }),
 
     fields: function(type){
-      return _.compact((this.setting(type) || '').split(','));
+      if (this.currentUserIsWithlistedFor(type))
+        return [];
+      return this.splittedSetting(type);
+    },
+
+    currentUserIsWithlistedFor: function(type){
+      return _.any([
+        this.currentUserIsWhitelistedByTagFor(type),
+        this.currentUserIsWhitelistedByGroupFor(type),
+        this.currentUserIsWhitelistedByOrganizationFor(type)
+      ]);
+    },
+
+    currentUserIsWhitelistedByTagFor: function(type){
+      var tags = this.splittedSetting(type + '_whitelist_tags');
+
+      return this.deepContains(this.data.user.tags, tags);
+    },
+
+    currentUserIsWhitelistedByGroupFor: function(type){
+      var group_ids = this.splittedSetting(type + '_whitelist_group_ids');
+      var current_group_ids = _.map(this.data.groups, function(group){
+        return String(group.id);
+      });
+
+      return this.deepContains(current_group_ids, group_ids);
+    },
+
+    currentUserIsWhitelistedByOrganizationFor: function(type){
+      var organization_ids = this.splittedSetting(type + '_whitelist_organization_ids');
+      var current_organization_ids = _.map(this.data.organizations, function(organization){
+        return String(organization.id);
+      });
+
+      return this.deepContains(current_organization_ids, organization_ids);
+    },
+
+    //list and values should be Arrays
+    deepContains: function(list, values){
+      var flattened_contains = _.inject(values, function(memo, value){
+        memo.push(_.contains(list, value));
+        return memo;
+      }, []);
+
+      return _.any(flattened_contains);
+    },
+
+    splittedSetting: function(name){
+      return _.compact((this.setting(name) || '').split(','));
     },
 
     validateField: function(field){
       var value = this.containerContext().ticket[field];
+
       var newFieldsOnError = [];
 
       if (_.isEmpty(value) || value == '-'){
@@ -91,12 +153,11 @@
       } else {
         newFieldsOnError = _.without(this.fieldsOnError, field);
       }
-
       this.fieldsOnError = newFieldsOnError;
     },
 
-    fieldsLabel: function(field){
-      return _.map(field, function(field){
+    fieldsLabel: function(fields){
+      return _.map(fields, function(field){
         return this.ticketFields(field).label();
       }, this);
     }
