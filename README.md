@@ -19,10 +19,10 @@ You can whitelist users from the settings. See the example for more information:
     "tag": "admin" // The fields wont be required if the user has the 'admin' tag                                                                                                                                               
   },                                                                                                                                                                                                                            
   "hidden_fields": {                                                                                                                                                                                                            
-    "group_id": "42424242" // The fields wont be hidden if the user is part of the group with id 42424242                                                                                                                       
+    "group_id": 42424242 // The fields wont be hidden if the user is part of the group with id 42424242                                                                                                                       
   },                                                                                                                                                                                                                            
   "readonly_fields": {                                                                                                                                                                                                          
-    "organization_id": "42424242" // The fields wont be readonly if the user is part of the organization with id 42424242                                                                                                       
+    "organization_id": 42424242 // The fields wont be readonly if the user is part of the organization with id 42424242                                                                                                       
   }                                                                                                                                                                                                                             
 }
 ```
