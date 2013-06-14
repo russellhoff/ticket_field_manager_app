@@ -145,7 +145,6 @@
 
     validateField: function(field){
       var value = this.containerContext().ticket[field];
-
       var newFieldsOnError = [];
 
       if (_.isEmpty(value) || value == '-'){
