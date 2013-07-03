@@ -19,9 +19,7 @@
 
     isReady: function(){
       return !this.doneLoading &&
-        this.ticket() &&
-        this.ticket().status() &&
-        _.contains(["new", "open", "pending"], this.ticket().status());
+        this.ticket();
     },
 
     initializeIfReady: function(){
