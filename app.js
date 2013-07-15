@@ -46,13 +46,13 @@
 
     handleHiddenFields: function(){
       this.hiddenFields().forEach(function(field){
-        this.ticketFields(field).hide();
+        this.ticketFields(field) && this.ticketFields(field).hide();
       }, this);
     },
 
     handleReadOnlyFields: function(){
       this.readOnlyFields().forEach(function(field){
-        this.ticketFields(field).disable();
+        this.ticketFields(field) && this.ticketFields(field).disable();
       }, this);
     },
 
