@@ -18,8 +18,7 @@
     },
 
     isReady: function(){
-      return !this.doneLoading &&
-        this.ticket();
+      return !this.doneLoading;
     },
 
     initializeIfReady: function(){
@@ -47,7 +46,7 @@
     handleHiddenFields: function(){
       this.hiddenFields().forEach(function(field){
         var ticket_field = this.ticketFields(field);
-        console.log(field);
+
         if(ticket_field) { ticket_field.hide(); }
       }, this);
     },
@@ -63,8 +62,7 @@
       // remove 'ticket.' from the event's propertyName in order to match our requiredFields
       var field = event.propertyName.replace('ticket.', '');
 
-      if (_.contains(this.requiredFields(), field) &&
-          this.doneLoading){
+      if (this.doneLoading && _.contains(this.requiredFields(), field)){
         this.validateField(field);
         this.renderErrorIfAny();
       }
