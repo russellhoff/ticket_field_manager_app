@@ -1,6 +1,7 @@
 # Ticket Field Manager
+An app to require/hide/readonly fields in your agent interface.
 
-## Available Required/Hidden/ReadOnly fields
+### Available Required/Hidden/ReadOnly fields
 * assignee
 * collaborator
 * type
