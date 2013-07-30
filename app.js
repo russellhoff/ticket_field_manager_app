@@ -5,13 +5,15 @@
     requests: {
       fetchUser: function(){
         return {
-          url: '/api/v2/users/'+ this.currentUser().id() + '.json?include=groups,organizations'
+          url: '/api/v2/users/'+ this.currentUser().id() + '.json?include=groups,organizations',
+          proxy_v2: true
         };
       }
     },
 
     events: {
       'app.activated'           : 'initializeIfReady',
+      'ticket.form.id.changed'  : 'handleFields',
       'ticket.status.changed'   : 'initializeIfReady',
       'fetchUser.done'          : 'initialize',
       '*.changed'               : 'handleFieldEvent'
@@ -30,9 +32,20 @@
     initialize: function(data){
       this.doneLoading = true;
       this.data = data;
-      this.handleRequiredFields();
-      this.handleHiddenFields();
-      this.handleReadOnlyFields();
+
+      this.handleFields();
+    },
+
+    handleFields: function(){
+      if (!this.data) return;
+
+      var self = this;
+
+      _.defer(function(){
+        self.handleRequiredFields();
+        self.handleHiddenFields();
+        self.handleReadOnlyFields();
+      });
     },
 
     handleRequiredFields: function(){
@@ -54,6 +67,7 @@
     handleReadOnlyFields: function(){
       this.readOnlyFields().forEach(function(field){
         var ticket_field = this.ticketFields(field);
+
         if(ticket_field) { ticket_field.disable(); }
       }, this);
     },
