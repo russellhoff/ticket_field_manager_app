@@ -6,6 +6,8 @@
       fetchUser: function(){
         return {
           url: '/api/v2/users/'+ this.currentUser().id() + '.json?include=groups,organizations',
+          dataType: 'json',
+          type: 'GET',
           proxy_v2: true
         };
       }
@@ -89,6 +91,7 @@
       } else {
         this.disableSave();
         this.switchTo('error', { fields: this.fieldsLabel(this.fieldsOnError) });
+        services.appsTray().show();
       }
     },
 
@@ -157,7 +160,7 @@
     },
 
     validateField: function(field){
-      var value = this.containerContext().ticket[field];
+      var value = _.clone(this.containerContext().ticket[field]);
       var newFieldsOnError = [];
 
       if (_.isEmpty(value) || value == '-'){
@@ -165,6 +168,7 @@
       } else {
         newFieldsOnError = _.without(this.fieldsOnError, field);
       }
+
       this.fieldsOnError = newFieldsOnError;
     },
 
