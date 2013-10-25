@@ -1,53 +1,44 @@
 (function() {
   return {
-    doneLoading: false,
     fieldsOnError: [],
     requests: {
       fetchUser: function(){
         return {
-          url: '/api/v2/users/'+ this.currentUser().id() + '.json?include=groups,organizations',
+          url: helpers.fmt('/api/v2/users/%@.json?include=groups,organizations',
+                           this.currentUser().id()),
           dataType: 'json',
-          type: 'GET',
-          proxy_v2: true
+          type: 'GET'
         };
       }
     },
 
     events: {
-      'app.activated'           : 'initializeIfReady',
-      'ticket.form.id.changed'  : 'handleFields',
-      'ticket.status.changed'   : 'initializeIfReady',
-      'fetchUser.done'          : 'initialize',
-      '*.changed'               : 'handleFieldEvent'
+      'app.activated'           : 'onAppActivated',
+      'ticket.form.id.changed'  : 'onFieldChanged',
+      'fetchUser.done'          : 'onFetchUserDone',
+      '*.changed'               : 'onFieldChanged'
     },
 
-    isReady: function(){
-      return !this.doneLoading;
+    onAppActivated: function(app){
+      this.ajax('fetchUser');
     },
 
-    initializeIfReady: function(){
-      if (this.isReady()){
-        this.ajax('fetchUser');
-      }
-    },
-
-    initialize: function(data){
-      this.doneLoading = true;
+    onFetchUserDone: function(data){
       this.data = data;
 
-      this.handleFields();
+      this.onFieldChanged();
     },
 
-    handleFields: function(){
+    onFieldChanged: function(){
       if (!this.data) return;
 
-      var self = this;
+      _.defer(this.handleFields.bind(this));
+    },
 
-      _.defer(function(){
-        self.handleRequiredFields();
-        self.handleHiddenFields();
-        self.handleReadOnlyFields();
-      });
+    handleFields: function() {
+      this.handleRequiredFields();
+      this.handleHiddenFields();
+      this.handleReadOnlyFields();
     },
 
     handleRequiredFields: function(){
