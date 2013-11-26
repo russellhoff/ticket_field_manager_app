@@ -165,7 +165,14 @@
 
     fieldsLabel: function(fields){
       return _.map(fields, function(field){
-        return this.ticketFields(field).label();
+        var tf = this.ticketFields(field),
+        value;
+
+        if (this.ticketFields(field)) {
+          return this.ticketFields(field).label();
+        } else {
+          return field;
+        }
       }, this);
     }
   };
