@@ -1,12 +1,22 @@
 # Ticket Field Manager
-An app to require/hide/readonly fields in your agent interface.
+An app to require/hide/disable fields in your agent interface.
 
-### Available Required/Hidden/ReadOnly fields
+### Available Fields
+* requester
 * assignee
 * collaborator
+* sharedWith
+* status
+* ticket_form_id (the ticket form dropdown)
+* tags
 * type
 * priority
-* tags
+* problem
+* due_date
 * custom_field_ID  `(Example: custom_field_1234)`
 
-Basically, you can use every field supported by the [Interface Api](http://goo.gl/XUrP5).
+You can also hide/disable options for a given dropdown field. Here's some examples:
+* status.pending
+* custom_field_23049272.third_option
+* assignee.21312636 (21312636 is the ID of a group)
+* assignee.21312636:422450083 (21312636 is the group ID and 422450083 is the user ID)

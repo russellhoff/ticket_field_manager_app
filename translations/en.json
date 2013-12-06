@@ -53,5 +53,5 @@
       }
     }
   },
-  "error_message": "The following fields cannot be empty"
+  "invalid_fields": "The following fields cannot be empty: <strong>{{fields}}</strong>"
 }
