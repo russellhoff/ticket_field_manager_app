@@ -2,7 +2,7 @@
   return {
     fieldsOnError: [],
     requests: {
-      fetchUser: function(){
+      fetchUser: function() {
         return {
           url: helpers.fmt('/api/v2/users/%@.json?include=groups,organizations',
                            this.currentUser().id()),
@@ -16,95 +16,98 @@
       'app.activated'           : 'onAppActivated',
       'ticket.form.id.changed'  : 'onFieldChanged',
       'fetchUser.done'          : 'onFetchUserDone',
-      '*.changed'               : 'onFieldChanged'
+      'ticket.save'             : 'onTicketSave'
     },
 
-    onAppActivated: function(app){
+    onAppActivated: function(app) {
       this.ajax('fetchUser');
     },
 
-    onFetchUserDone: function(data){
+    onFetchUserDone: function(data) {
       this.data = data;
 
       this.onFieldChanged();
     },
 
-    onFieldChanged: function(){
+    onTicketSave: function() {
+      var fieldsOnError = this.validateRequiredFields();
+
+      if (!_.isEmpty(fieldsOnError)) {
+        return this.I18n.t('invalid_fields', { fields: this.fieldsLabel(fieldsOnError).join(',') });
+      }
+
+      return true;
+    },
+
+    onFieldChanged: function() {
       if (!this.data) return;
 
       _.defer(this.handleFields.bind(this));
     },
 
     handleFields: function() {
-      this.handleRequiredFields();
       this.handleHiddenFields();
       this.handleReadOnlyFields();
     },
 
-    handleRequiredFields: function(){
-      this.requiredFields().forEach(function(field){
-        this.validateField(field);
-      }, this);
-
-      this.renderErrorIfAny();
-    },
-
-    handleHiddenFields: function(){
-      this.hiddenFields().forEach(function(field){
-        var ticket_field = this.ticketFields(field);
-
-        if(ticket_field) { ticket_field.hide(); }
+    validateRequiredFields: function() {
+      return _.map(this.requiredFields(), function(field) {
+        if (!this.fieldIsValid(field)) {
+          return field;
+        }
       }, this);
     },
 
-    handleReadOnlyFields: function(){
-      this.readOnlyFields().forEach(function(field){
-        var ticket_field = this.ticketFields(field);
-
-        if(ticket_field) { ticket_field.disable(); }
+    handleHiddenFields: function() {
+      this.hiddenFields().forEach(function(field) {
+        this.appyActionOnField(field, 'hide');
       }, this);
     },
 
-    handleFieldEvent: function(event){
-      // remove 'ticket.' from the event's propertyName in order to match our requiredFields
-      var field = event.propertyName.replace('ticket.', '');
-
-      if (this.doneLoading && _.contains(this.requiredFields(), field)){
-        this.validateField(field);
-        this.renderErrorIfAny();
-      }
+    handleReadOnlyFields: function() {
+      this.readOnlyFields().forEach(function(field) {
+        this.appyActionOnField(field, 'disable');
+      }, this);
     },
 
-    renderErrorIfAny: function(){
-      if (_.isEmpty(this.fieldsOnError)){
-        this.enableSave();
-        this.switchTo('blank');
+    appyActionOnField: function(field, action) {
+      var splittedField = field.split('.'),
+      fieldName = splittedField[0],
+      optionValue = splittedField[1],
+      ticketField = this.ticketFields(fieldName);
+
+      if (optionValue && ticketField.options()) {
+        var option = _.find(ticketField.options(), function(opt) {
+          return opt.value() == optionValue;
+        });
+
+        if (option) {
+          option[action]();
+        }
       } else {
-        this.disableSave();
-        this.switchTo('error', { fields: this.fieldsLabel(this.fieldsOnError) });
-        services.appsTray().show();
+        ticketField[action]();
       }
     },
 
-    requiredFields: _.memoize(function(){
+    requiredFields: _.memoize(function() {
       return this.fields('required_fields');
     }),
 
-    hiddenFields: _.memoize(function(){
+    hiddenFields: _.memoize(function() {
       return this.fields('hidden_fields');
     }),
 
-    readOnlyFields: _.memoize(function(){
+    readOnlyFields: _.memoize(function() {
       return this.fields('readonly_fields');
     }),
 
-    fields: function(type){
+    fields: function(type) {
       if (this.currentUserIsWithlistedFor(type))
         return [];
       return this.splittedSetting(type);
     },
 
-    currentUserIsWithlistedFor: function(type){
+    currentUserIsWithlistedFor: function(type) {
       return _.any([
         this.currentUserIsWhitelistedByTagFor(type),
         this.currentUserIsWhitelistedByGroupFor(type),
@@ -112,33 +115,33 @@
       ]);
     },
 
-    currentUserIsWhitelistedByTagFor: function(type){
+    currentUserIsWhitelistedByTagFor: function(type) {
       var tags = this.splittedSetting(type + '_whitelist_tags');
 
       return this.deepContains(this.data.user.tags, tags);
     },
 
-    currentUserIsWhitelistedByGroupFor: function(type){
-      var group_ids = this.splittedSetting(type + '_whitelist_group_ids');
-      var current_group_ids = _.map(this.data.groups, function(group){
-        return String(group.id);
-      });
+    currentUserIsWhitelistedByGroupFor: function(type) {
+      var group_ids = this.splittedSetting(type + '_whitelist_group_ids'),
+          current_group_ids = _.map(this.data.groups, function(group) {
+            return String(group.id);
+          });
 
       return this.deepContains(current_group_ids, group_ids);
     },
 
-    currentUserIsWhitelistedByOrganizationFor: function(type){
-      var organization_ids = this.splittedSetting(type + '_whitelist_organization_ids');
-      var current_organization_ids = _.map(this.data.organizations, function(organization){
-        return String(organization.id);
-      });
+    currentUserIsWhitelistedByOrganizationFor: function(type) {
+      var organization_ids = this.splittedSetting(type + '_whitelist_organization_ids'),
+          current_organization_ids = _.map(this.data.organizations, function(organization) {
+            return String(organization.id);
+          });
 
       return this.deepContains(current_organization_ids, organization_ids);
     },
 
     //list and values should be Arrays
-    deepContains: function(list, values){
-      var flattened_contains = _.inject(values, function(memo, value){
+    deepContains: function(list, values) {
+      var flattened_contains = _.inject(values, function(memo, value) {
         memo.push(_.contains(list, value));
         return memo;
       }, []);
@@ -146,30 +149,27 @@
       return _.any(flattened_contains);
     },
 
-    splittedSetting: function(name){
+    splittedSetting: function(name) {
       return _.compact((this.setting(name) || '').split(','));
     },
 
-    validateField: function(field){
+    fieldIsValid: function(field) {
       var value = _.clone(this.containerContext().ticket[field]);
-      var newFieldsOnError = [];
 
-      if (_.isEmpty(value) || value == '-'){
-        newFieldsOnError = _.union(this.fieldsOnError, [field]);
-      } else {
-        newFieldsOnError = _.without(this.fieldsOnError, field);
+      if (_.isEmpty(value) || value == '-') {
+        return true;
       }
 
-      this.fieldsOnError = newFieldsOnError;
+      return false;
     },
 
-    fieldsLabel: function(fields){
-      return _.map(fields, function(field){
+    fieldsLabel: function(fields) {
+      return _.map(fields, function(field) {
         var tf = this.ticketFields(field),
-        value;
+            label = this.ticketFields(field) && this.ticketFields(field).label();
 
-        if (this.ticketFields(field)) {
-          return this.ticketFields(field).label();
+        if (label) {
+          return label;
         } else {
           return field;
         }
