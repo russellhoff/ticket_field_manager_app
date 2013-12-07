@@ -51,10 +51,8 @@
     },
 
     validateRequiredFields: function() {
-      return _.map(this.requiredFields(), function(field) {
-        if (!this.fieldIsValid(field)) {
-          return field;
-        }
+      return _.filter(this.requiredFields(), function(field) {
+        return !this.fieldIsValid(field);
       }, this);
     },
 
@@ -157,10 +155,10 @@
       var value = _.clone(this.containerContext().ticket[field]);
 
       if (_.isEmpty(value) || value == '-') {
-        return true;
+        return false;
       }
 
-      return false;
+      return true;
     },
 
     fieldsLabel: function(fields) {
