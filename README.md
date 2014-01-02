@@ -20,3 +20,5 @@ You can also hide/disable options for a given dropdown field. Here's some exampl
 * custom_field_23049272.third_option
 * assignee.21312636 (21312636 is the ID of a group)
 * assignee.21312636:422450083 (21312636 is the group ID and 422450083 is the user ID)
+
+By downloading this app, you are agreeing to our [terms and conditions](https://github.com/zendesklabs/wiki/wiki/Terms-and-Conditions)
