@@ -1,3 +1,5 @@
+:warning: *Use of this software is subject to important terms and conditions as set forth in the License file* :warning:
+
 # Ticket Field Manager
 An app to require/hide/disable fields in your agent interface.
 
