@@ -154,7 +154,9 @@
     fieldIsValid: function(field) {
       var value = _.clone(this.containerContext().ticket[field]);
 
-      if (_.isEmpty(value) || value == '-') {
+      // field is present and is empty
+      if (this.ticketFields(field) &&
+          (_.isEmpty(value) || value == '-')) {
         return false;
       }
 
