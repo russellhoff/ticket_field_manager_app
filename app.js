@@ -58,17 +58,17 @@
 
     handleHiddenFields: function() {
       this.hiddenFields().forEach(function(field) {
-        this.appyActionOnField(field, 'hide');
+        this.applyActionOnField(field, 'hide');
       }, this);
     },
 
     handleReadOnlyFields: function() {
       this.readOnlyFields().forEach(function(field) {
-        this.appyActionOnField(field, 'disable');
+        this.applyActionOnField(field, 'disable');
       }, this);
     },
 
-    appyActionOnField: function(field, action) {
+    applyActionOnField: function(field, action) {
       var splittedField = field.split('.'),
       fieldName = splittedField[0],
       optionValue = splittedField[1],
