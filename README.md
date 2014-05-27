@@ -14,7 +14,6 @@ An app to require/hide/disable fields in your agent interface.
 * type
 * priority
 * problem
-* due_date
 * custom_field_ID  `(Example: custom_field_1234)`
 
 You can also hide/disable options for a given dropdown field. Here's some examples:
