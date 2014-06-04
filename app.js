@@ -74,6 +74,8 @@
       optionValue = splittedField[1],
       ticketField = this.ticketFields(fieldName);
 
+      if (!ticketField) { return false; }
+
       if (optionValue && ticketField.options()) {
         var option = _.find(ticketField.options(), function(opt) {
           return opt.value() == optionValue;
