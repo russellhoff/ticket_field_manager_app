@@ -14,9 +14,9 @@
 
     events: {
       'app.activated'           : 'onAppActivated',
-      'ticket.form.id.changed'  : 'onFieldChanged',
       'fetchUser.done'          : 'onFetchUserDone',
-      'ticket.save'             : 'onTicketSave'
+      'ticket.save'             : 'onTicketSave',
+      '*.changed'               : 'onFieldChanged'
     },
 
     onAppActivated: function(app) {
