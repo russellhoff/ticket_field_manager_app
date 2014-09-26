@@ -53,5 +53,8 @@
       }
     }
   },
-  "invalid_fields": "The following fields cannot be empty: <strong>{{fields}}</strong>"
+  "invalid_fields": "The following fields cannot be empty: <strong>{{fields}}</strong>",
+  "app_connectivity_issues": "Please try again shortly...<HR /><small>Network connection issue with call to /api/v2/users/{{currentUserId}}.json - Refresh of apps tray may be required<BR />(App Install ID: {{installationId}})</small>",
+  "app_connectivity_issues_with_name": "<strong>{{installationName}}</strong><BR />Please try again shortly...<HR /><small>Network connection issue with call to /api/v2/users/{{currentUserId}}.json - Refresh of apps tray may be required<BR />(App Install ID: {{installationId}})</small>",
+  "app_api_user_issues": "<strong>{{installationName}}</strong><BR />Please refresh the apps tray and try again shortly...<HR /><small>Issue with call to /api/v2/users/{{currentUserId}}.json not returning expected currentUser data<BR />(App Install ID: {{installationId}})</small>"
 }

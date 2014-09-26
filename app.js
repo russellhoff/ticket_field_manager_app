@@ -13,10 +13,36 @@
     },
 
     events: {
-      'app.activated'           : 'onAppActivated',
-      'fetchUser.done'          : 'onFetchUserDone',
-      'ticket.save'             : 'onTicketSave',
-      '*.changed'               : 'onFieldChanged'
+      'app.activated'             : 'onAppActivated',
+      'fetchUser.done'            : 'onFetchUserDone',
+      'fetchUser.fail'            : 'onFetchUserFail',
+      'fetchUserNoCallback.fail'  : 'onFetchUserFail',
+      'ticket.save'               : 'onTicketSave',
+      '*.changed'                 : 'onFieldChanged'
+    },
+
+    currentUserData: function(data) {
+      data = data || this.store('ticketfieldmanager_user');
+
+      if (_.isUndefined(data)) {
+        this.ajax('fetchUser');
+      } else {
+        if (_.isUndefined(data.user) || _.isUndefined(data.user.tags) || _.isUndefined(data.organizations) || _.isUndefined(data.groups)) {
+          // display error
+          services.notify(this.I18n.t('app_api_user_issues', { 
+            installationId: this.installationId(), 
+            currentUserId: this.currentUser().id(),
+            installationName: this.setting('name')
+          }), 'error', 30000);
+        } else {
+          if (data.user.id == this.currentUser().id()) {
+            this.store('ticketfieldmanager_user', data);
+            return data;  
+          } else {
+            this.ajax('fetchUser');
+          }
+        }
+      }
     },
 
     onAppActivated: function(app) {
@@ -24,23 +50,42 @@
     },
 
     onFetchUserDone: function(data) {
-      this.data = data;
-
+      this.currentUserData(data);
       this.onFieldChanged();
     },
 
+    onFetchUserFail: function(xhr, text_status, error_thrown) {
+      if (text_status != "abort") {
+        services.notify(this.I18n.t('app_connectivity_issues_with_name', { 
+              installationId: this.installationId(), 
+              currentUserId: this.currentUser().id(),
+              installationName: this.setting('name')
+            }), 'error', 30000);
+      }
+    },
+
     onTicketSave: function() {
+      // Check if User exists
+      if (this.currentUserData()) {
+        // User exists
+        this.onTicketSaveContinue();
+      } else {
+        return false;
+      }
+    },
+
+    onTicketSaveContinue: function() {
       var fieldsOnError = this.validateRequiredFields();
 
       if (!_.isEmpty(fieldsOnError)) {
         return this.I18n.t('invalid_fields', { fields: this.fieldsLabel(fieldsOnError).join(',') });
       }
-
+        
       return true;
     },
 
     onFieldChanged: function() {
-      if (!this.data) return;
+      if (!this.currentUserData()) return;
 
       _.defer(this.handleFields.bind(this));
     },
@@ -118,12 +163,12 @@
     currentUserIsWhitelistedByTagFor: function(type) {
       var tags = this.splittedSetting(type + '_whitelist_tags');
 
-      return this.deepContains(this.data.user.tags, tags);
+      return this.deepContains(this.currentUserData().user.tags, tags);
     },
 
     currentUserIsWhitelistedByGroupFor: function(type) {
       var group_ids = this.splittedSetting(type + '_whitelist_group_ids'),
-          current_group_ids = _.map(this.data.groups, function(group) {
+          current_group_ids = _.map(this.currentUserData().groups, function(group) {
             return String(group.id);
           });
 
@@ -132,7 +177,7 @@
 
     currentUserIsWhitelistedByOrganizationFor: function(type) {
       var organization_ids = this.splittedSetting(type + '_whitelist_organization_ids'),
-          current_organization_ids = _.map(this.data.organizations, function(organization) {
+          current_organization_ids = _.map(this.currentUserData().organizations, function(organization) {
             return String(organization.id);
           });
 

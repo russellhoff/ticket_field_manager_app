@@ -57,7 +57,7 @@
   "defaultLocale": "en",
   "private": true,
   "noTemplate": true,
-  "version": "1.4",
+  "version": "1.4.1",
   "location": [ "ticket_sidebar", "new_ticket_sidebar" ],
   "frameworkVersion": "1.0"
 }
