@@ -159,7 +159,8 @@
       // field is present and is empty
       if (this.ticketFields(field) &&
           (_.isEmpty(value) || value == '-' ||
-           (field == "type" && value == "ticket"))) {
+            (field == "type" && value == "ticket") ||
+              (field == "requester" && _.isEmpty(value.email)))) {
         return false;
       }
 
