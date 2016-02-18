@@ -4,6 +4,7 @@
 An app to require/hide/disable fields in your agent interface.
 
 ### Available Fields
+* brand
 * requester
 * assignee
 * collaborator
