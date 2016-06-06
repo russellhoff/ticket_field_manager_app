@@ -1,6 +1,8 @@
 :warning: *Use of this software is subject to important terms and conditions as set forth in the License file* :warning:
 
 # Ticket Field Manager
+
+## Description
 An app to require/hide/disable fields in your agent interface.
 
 ### Available Fields
@@ -24,3 +26,6 @@ You can also hide/disable options for a given dropdown field. Here's some exampl
 * assignee.21312636:422450083 (21312636 is the group ID and 422450083 is the user ID)
 
 By downloading this app, you are agreeing to our [terms and conditions](https://github.com/zendesklabs/wiki/wiki/Terms-and-Conditions)
+
+## Screenshot(s):
+* None
