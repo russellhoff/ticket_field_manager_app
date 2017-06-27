@@ -8,7 +8,8 @@ An app to require/hide/disable fields in your agent interface.
 ### Available Fields
 * brand
 * requester
-* assignee
+* group  `(Example: assignee.group)`
+* assignee  `(Example: assignee.user)`
 * collaborator
 * sharedWith
 * status
