@@ -154,13 +154,23 @@
     },
 
     fieldIsValid: function(field) {
-      var value = _.clone(this.containerContext().ticket[field]);
-
-      // field is present and is empty
+	    var field1;
+	    if (field == "assignee.group"){
+		    field = "assignee";
+		    field1 = "group";
+	    } else if (field == "assignee.user"){
+		    field = "assignee";
+		    field1 = "user";
+	    }
+	    
+      var value = _.clone(this.containerContext().ticket[field]);			
+      
       if (this.ticketFields(field) &&
           (_.isEmpty(value) || value == '-' ||
             (field == "type" && value == "ticket") ||
-              (field == "requester" && _.isEmpty(value.email)))) {
+              (field == "requester" && _.isEmpty(value.email) ||
+              	(field1 == "user" && _.isEmpty(value.user.email) ||
+              		(field1 == "group" && _.isEmpty(value.group.name)))))) {
         return false;
       }
 
